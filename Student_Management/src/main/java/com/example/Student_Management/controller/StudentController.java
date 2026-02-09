@@ -1,14 +1,16 @@
 package com.example.Student_Management.controller;
-
+//record-immutable object
 import com.example.Student_Management.dto.StudentRequestDto;
 import com.example.Student_Management.dto.StudentResponseDto;
 import com.example.Student_Management.model.StudentModel;
 import com.example.Student_Management.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import java.util.Map;
 
+
+@CrossOrigin(origins="*")
 @RestController
 public class StudentController {
     private final StudentService service;
@@ -36,18 +38,23 @@ public class StudentController {
 //        service.deleteStudent(id);
 //        return "Student deleted successfully";
 //    }
-      @DeleteMapping("/{id}")
+      @DeleteMapping("/delete/{id}")
       public String deleteStudent(@PathVariable String id) {
       service.deleteStudent(id);
       return "Student deleted successfully";
       }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public StudentResponseDto updateStudent(
             @PathVariable String id,
             @Valid @RequestBody StudentRequestDto student) {
 
         return service.updateStudent(id, student);
+    }
+    @PatchMapping("/patch/{id}")
+    public StudentResponseDto patchStudent(@PathVariable String id,
+                                           @RequestBody Map<String, Object> updates) {
+        return service.patchStudent(id, updates);
     }
 //    @PutMapping("/update/{id}")
 //    public StudentModel updateStudent(@PathVariable String id, @RequestBody StudentModel student) {

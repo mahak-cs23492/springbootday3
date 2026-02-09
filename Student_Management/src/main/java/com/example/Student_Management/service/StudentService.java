@@ -8,6 +8,7 @@ import com.example.Student_Management.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StudentService {
@@ -62,11 +63,13 @@ public class StudentService {
         )).toList();
     }
     public void deleteStudent(String id) {
-        if (!repository.existsById(id)) {
-            throw new StudentNotFoundException("Student not found");
-        }
-        repository.deleteById(id);
+
+        StudentModel student = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        repository.delete(student);
     }
+
     public StudentResponseDto updateStudent(String id, StudentRequestDto dto) {
 
         StudentModel existingStudent = repository.findById(id)
@@ -78,6 +81,31 @@ public class StudentService {
         existingStudent.setEmail(dto.getEmail());
 
         StudentModel updated = repository.save(existingStudent);
+
+        return new StudentResponseDto(
+                updated.getId(),
+                updated.getName(),
+                updated.getAge(),
+                updated.getEmail()
+        );
+    }
+    public StudentResponseDto patchStudent(String id, Map<String, Object> updates) {
+        StudentModel student = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        if (updates.containsKey("name")) {
+            student.setName((String) updates.get("name"));
+        }
+
+        if (updates.containsKey("age")) {
+            student.setAge((Integer) updates.get("age"));
+        }
+
+        if (updates.containsKey("email")) {
+            student.setEmail((String) updates.get("email"));
+        }
+
+        StudentModel updated = repository.save(student);
 
         return new StudentResponseDto(
                 updated.getId(),
